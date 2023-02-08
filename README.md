@@ -10,3 +10,4 @@ Stacks:
   - Elasticsearch
   - Kubernetes
   - Docker
+  - Kibana
