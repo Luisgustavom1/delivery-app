@@ -9,3 +9,4 @@ Stacks:
   - ReactJS
   - Elasticsearch
   - Kubernetes
+  - Docker
