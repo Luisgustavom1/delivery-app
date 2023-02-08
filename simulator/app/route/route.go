@@ -27,6 +27,10 @@ type Position struct {
 	Long float64 `json:"long"`
 }
 
+func NewRoute() *Route {
+	return &Route{}
+}
+
 func (r *Route) LoadPositions() error {
 	if r.ID == "" {
 		return errors.New("Route id not informed")
