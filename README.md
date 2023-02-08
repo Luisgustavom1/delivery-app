@@ -2,7 +2,7 @@
 
 A microservices oriented delivery application project:
 
-Stacks:
+Stack:
   - Golang
   - Kafka
   - NestJS
