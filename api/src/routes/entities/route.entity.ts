@@ -1,11 +1,12 @@
 import { Prop, Schema, raw, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type RouteDocument = Route & Document;
 
 @Schema()
 export class Route {
-  _id: MongooseSchema.Types.ObjectId;
+  @Prop()
+  _id: string;
 
   @Prop()
   title: string;
