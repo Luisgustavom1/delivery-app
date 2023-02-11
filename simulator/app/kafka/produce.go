@@ -23,6 +23,6 @@ func Produce(msg *ckafka.Message) {
 
 	for _, position := range positions {
 		kafka.Publish(position, os.Getenv("KafkaProduceTopic"), producer)
-		time.Sleep(time.Microsecond * 500)
+		time.Sleep(time.Millisecond * 500)
 	}
 }
