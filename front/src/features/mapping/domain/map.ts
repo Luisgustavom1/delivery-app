@@ -47,6 +47,12 @@ export class Route {
       throw new Error(status)
     })
   }
+
+  delete() {
+    this.currentMarket.setMap(null)
+    this.endMarker.setMap(null)
+    this.directionsRenderer.setMap(null)
+  }
 }
 
 export class Map {
@@ -58,6 +64,10 @@ export class Map {
     options: google.maps.MapOptions,
   ) {
     this.map = new google.maps.Map(element, options);
+  }
+
+  moveCurrentMarker(id: string, position: google.maps.LatLngLiteral) {
+    this.routes[id].currentMarket.setPosition(position)
   }
 
   addRoute(
@@ -80,6 +90,12 @@ export class Map {
     })
 
     this.fitBounds()
+  }
+
+  removeRoute(routeId: string) {
+    const route = this.routes[routeId]
+    route.delete()
+    delete this.routes[routeId]
   }
 
   private fitBounds() {

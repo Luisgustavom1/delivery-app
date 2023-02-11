@@ -9,6 +9,7 @@ import { makeCarIcon, makeMarkerIcon } from '../../shared/icons'
 import { sample, shuffle } from 'lodash'
 import { RoutesExistsError } from "../../errors/routes-exists";
 import { useToast } from '@chakra-ui/react'
+import * as io from 'socket.io-client'
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -30,15 +31,26 @@ const colorMap = [
 export const Mapping = () => {
   const mapRef = useRef<Map>();
   const [routeIdSelected, setRouteIdSelected] = useState<string | null>(null);
-  const { data, isLoading } = useQuery(['routes'], () => 
+  const { data: routes, isLoading } = useQuery(['routes'], () => 
     fetch(`${API_URL}/routes`)
       .then(res => res.json() as Promise<Route[]>)
   );
+  const socketIORef = useRef<io.Socket>()
   const toast = useToast()
+
+  const finishRoute = useCallback((route: Route) => {
+    toast({
+      title: `${route?.title} finalizou!`,
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    })
+    mapRef.current?.removeRoute(route._id)
+  }, [toast])
 
   const startRoute = useCallback(async (e: FormEvent) => {
     e.preventDefault()
-    const routeSelected = data?.find(route => route._id === routeIdSelected)
+    const routeSelected = routes?.find(route => route._id === routeIdSelected)
     
     try {
       if (!routeSelected) return; 
@@ -54,6 +66,9 @@ export const Mapping = () => {
           position: routeSelected.endPosition,
           icon: makeMarkerIcon(color)
         }      
+      })
+      socketIORef.current?.emit('new-direction', {
+        routeId: routeIdSelected
       })
     } catch (error) {
       if (error instanceof RoutesExistsError) {
@@ -74,6 +89,35 @@ export const Mapping = () => {
       })
     }
   }, [routeIdSelected]);
+
+  useEffect(() => {
+    if (!socketIORef.current?.connected) {
+      socketIORef.current = io.connect(API_URL)
+      socketIORef.current.on('connect', () => console.log('Connected'))
+    }
+
+    const handler = (data: {
+      routeId: string;
+      position: [number, number];
+      finished: boolean;
+    }) => {
+      mapRef.current?.moveCurrentMarker(data.routeId, {
+        lat: data.position[0],
+        lng: data.position[1]
+      })
+
+      if (data.finished) {
+        const route = routes?.find(route => route._id === data.routeId) as Route
+ 
+        finishRoute(route)
+      }
+    }
+
+    socketIORef.current.on('new-position', handler)
+    return () => {
+      socketIORef.current?.off('new-position', handler)
+    }
+  }, [routeIdSelected])
 
   useEffect(() => {
     (async () => {
@@ -101,7 +145,7 @@ export const Mapping = () => {
           ) : (
             <Stack as='form' spacing='4' onSubmit={startRoute}>
               <Select placeholder='Select a route' onChange={e => setRouteIdSelected(e.target.value)}>
-                {data?.map((route) => (
+                {routes?.map((route) => (
                   <option value={route._id} key={route._id}>{route.title}</option>
                 ))}
               </Select>
