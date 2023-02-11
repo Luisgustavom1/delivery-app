@@ -27,6 +27,8 @@
     "@nestjs/microservices": "^9.3.7",
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/platform-socket.io": "^9.3.8",
+    "@nestjs/websockets": "^9.3.8",
     "kafkajs": "^2.2.3",
     "mongoose": "^6.9.1",
     "reflect-metadata": "^0.1.13",
