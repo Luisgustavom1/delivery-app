@@ -1,0 +1,1 @@
+export class RoutesExistsError extends Error {}

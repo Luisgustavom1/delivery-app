@@ -7,6 +7,8 @@ import { getCurrentPosition } from "../../shared/geolocation";
 import { Map } from '../mapping/domain/map'
 import { makeCarIcon, makeMarkerIcon } from '../../shared/icons'
 import { sample, shuffle } from 'lodash'
+import { RoutesExistsError } from "../../errors/routes-exists";
+import { useToast } from '@chakra-ui/react'
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -32,30 +34,50 @@ export const Mapping = () => {
     fetch(`${API_URL}/routes`)
       .then(res => res.json() as Promise<Route[]>)
   );
+  const toast = useToast()
 
   const startRoute = useCallback(async (e: FormEvent) => {
     e.preventDefault()
     const routeSelected = data?.find(route => route._id === routeIdSelected)
     
-    if (!routeSelected) return; 
+    try {
+      if (!routeSelected) return; 
 
-    const color = sample(shuffle(colorMap)) as string;
+      const color = sample(shuffle(colorMap)) as string;
+  
+      mapRef.current?.addRoute(routeSelected._id, {
+        currentMarkerOptions: {
+          position: routeSelected.startPosition,
+          icon: makeCarIcon(color)
+        },
+        endMarkerOptions: {
+          position: routeSelected.endPosition,
+          icon: makeMarkerIcon(color)
+        }      
+      })
+    } catch (error) {
+      if (error instanceof RoutesExistsError) {
+        toast({
+          title: `${routeSelected?.title} já adicionado, espere finalizar!`,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+        return
+      }
 
-    mapRef.current?.addRoute(routeSelected._id, {
-      currentMarkerOptions: {
-        position: routeSelected.startPosition,
-        icon: makeCarIcon(color)
-      },
-      endMarkerOptions: {
-        position: routeSelected.endPosition,
-        icon: makeMarkerIcon(color)
-      }      
-    })
+      toast({
+        title: (error as Error).message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
   }, [routeIdSelected]);
 
   useEffect(() => {
     (async () => {
-      const [google, position] = await Promise.all([
+      const [_, position] = await Promise.all([
         googleMapsLoader.load(),
         getCurrentPosition({ enableHighAccuracy: true })
       ]);
