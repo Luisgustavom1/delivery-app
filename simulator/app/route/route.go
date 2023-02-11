@@ -71,7 +71,7 @@ func (r *Route) ExportJsonPositions() ([]string, error) {
 
 	route.ID = r.ID
 	route.ClientID = r.ClientID
-	route.Finished = true
+	route.Finished = false
 
 	for index, position := range r.Positions {
 		route.Position = []float64{position.Lat, position.Long}
