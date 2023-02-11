@@ -1,16 +1,32 @@
 import { Box, Button, Grid, GridItem, Select, Skeleton, Stack } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { google, Loader } from "google-maps";
+import { Loader } from "google-maps";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Route } from "../../models/route";
 import { getCurrentPosition } from "../../shared/geolocation";
+import { Map } from '../mapping/domain/map'
+import { makeCarIcon, makeMarkerIcon } from '../../shared/icons'
+import { sample, shuffle } from 'lodash'
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const googleMapsLoader = new Loader(import.meta.env.VITE_GOOGLE_API_KEY)
 
+const colorMap = [
+  "#b71c1c",
+  "#4a148c",
+  "#2e7d32",
+  "#e65100",
+  "#2962ff",
+  "#c2185b",
+  "#FFCD00",
+  "#3e2723",
+  "#03a9f4",
+  "#827717",
+];
+
 export const Mapping = () => {
-  const mapRef = useRef<google.maps.Map>();
+  const mapRef = useRef<Map>();
   const [routeIdSelected, setRouteIdSelected] = useState<string | null>(null);
   const { data, isLoading } = useQuery(['routes'], () => 
     fetch(`${API_URL}/routes`)
@@ -23,21 +39,17 @@ export const Mapping = () => {
     
     if (!routeSelected) return; 
 
-    const google = await googleMapsLoader.load();
+    const color = sample(shuffle(colorMap)) as string;
 
-    new google.maps.Marker({
-      map: mapRef.current,
-      position: {
-        lat: routeSelected.startPosition.lat,
-        lng: routeSelected.startPosition.lng
+    mapRef.current?.addRoute(routeSelected._id, {
+      currentMarkerOptions: {
+        position: routeSelected.startPosition,
+        icon: makeCarIcon(color)
       },
-    })
-    new google.maps.Marker({
-      map: mapRef.current,
-      position: {
-        lat: routeSelected.endPosition.lat,
-        lng: routeSelected.endPosition.lng
-      },
+      endMarkerOptions: {
+        position: routeSelected.endPosition,
+        icon: makeMarkerIcon(color)
+      }      
     })
   }, [routeIdSelected]);
 
@@ -49,7 +61,7 @@ export const Mapping = () => {
       ]);
 
       const divMap = document.getElementById('map') as HTMLElement
-      mapRef.current = new google.maps.Map(divMap, {
+      mapRef.current = new Map(divMap, {
         zoom: 15,
         center: position
       })
