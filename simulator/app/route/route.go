@@ -46,11 +46,11 @@ func (r *Route) LoadPositions() error {
 	for scanner.Scan() {
 		coordinates := strings.Split(scanner.Text(), ",")
 
-		lat, err := strconv.ParseFloat(coordinates[0], 64)
+		lat, err := strconv.ParseFloat(coordinates[1], 64)
 		if err != nil {
 			return nil
 		}
-		long, err := strconv.ParseFloat(coordinates[1], 64)
+		long, err := strconv.ParseFloat(coordinates[0], 64)
 		if err != nil {
 			return nil
 		}
