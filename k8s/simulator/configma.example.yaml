@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simulator-conf
+data:
+  env: |
+    KafkaReadTopic=read-topic
+    KafkaProduceTopic=produce-topic
+    KafkaBootstrapServers=any-host:port
+    KafkaConsumerGroupId=group-id
+    security.protocol=protocol
+    sasl.mechanisms=mechanisms
+    sasl.username=username
+    sasl.password=password
