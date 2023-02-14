@@ -93,7 +93,7 @@ export const Mapping = () => {
   useEffect(() => {
     if (!socketIORef.current?.connected) {
       socketIORef.current = io.connect(API_URL)
-      socketIORef.current.on('connect', () => console.log('Connected'))
+      socketIORef.current.on('connect', () => {})
     }
 
     const handler = (data: {
