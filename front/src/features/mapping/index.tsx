@@ -1,4 +1,4 @@
-import { Box, Button, Grid, GridItem, Select, Skeleton, Stack } from "@chakra-ui/react";
+import { Box, Button, Flex, Select, Skeleton, Stack } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "google-maps";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -29,14 +29,14 @@ const colorMap = [
 ];
 
 export const Mapping = () => {
-  const mapRef = useRef<Map>();
-  const [routeIdSelected, setRouteIdSelected] = useState<string | null>(null);
+  const toast = useToast()
   const { data: routes, isLoading } = useQuery(['routes'], () => 
     fetch(`${API_URL}/routes`)
       .then(res => res.json() as Promise<Route[]>)
   );
+  const [mapRef, setMapRef] = useState<Map | null>(null);
+  const [routeIdSelected, setRouteIdSelected] = useState<string | null>(null);
   const socketIORef = useRef<io.Socket>()
-  const toast = useToast()
 
   const finishRoute = useCallback((route: Route) => {
     toast({
@@ -45,7 +45,7 @@ export const Mapping = () => {
       duration: 3000,
       isClosable: true,
     })
-    mapRef.current?.removeRoute(route._id)
+    mapRef?.removeRoute(route._id)
   }, [toast])
 
   const startRoute = useCallback(async (e: FormEvent) => {
@@ -57,7 +57,7 @@ export const Mapping = () => {
 
       const color = sample(shuffle(colorMap)) as string;
   
-      mapRef.current?.addRoute(routeSelected._id, {
+      mapRef?.addRoute(routeSelected._id, {
         currentMarkerOptions: {
           position: routeSelected.startPosition,
           icon: makeCarIcon(color)
@@ -101,7 +101,7 @@ export const Mapping = () => {
       position: [number, number];
       finished: boolean;
     }) => {
-      mapRef.current?.moveCurrentMarker(data.routeId, {
+      mapRef?.moveCurrentMarker(data.routeId, {
         lat: data.position[0],
         lng: data.position[1]
       })
@@ -127,16 +127,16 @@ export const Mapping = () => {
       ]);
 
       const divMap = document.getElementById('map') as HTMLElement
-      mapRef.current = new Map(divMap, {
+      setMapRef(new Map(divMap, {
         zoom: 15,
         center: position
-      })
+      }))
     })()
   }, [])
 
   return (
-    <Grid templateColumns='repeat(12, 1fr)' gap={8} height='100vh' padding='16px'>
-      <GridItem as='aside' colSpan={4} marginTop='32px'>
+    <Flex as='main' direction={["column", "row"]} justify='space-between' gap={8} height="calc(100vh - 64px)" width='full' padding={4}>
+      <Box as='aside' minWidth="72" marginTop='32px'>
         {isLoading ? (
             <Stack as='form' spacing='4'>
               <Skeleton height='40px' />
@@ -154,10 +154,11 @@ export const Mapping = () => {
               </Button>
             </Stack>
           )}
-      </GridItem>
-      <GridItem as='section' colSpan={8}>
+      </Box>
+      <Box as='section' flex='1'>
+        {!mapRef&& <Skeleton height='100%' />}
         <Box id='map' height='100%'></Box>
-      </GridItem>
-    </Grid>
+      </Box>
+    </Flex>
   );
 };
