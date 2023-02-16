@@ -34,7 +34,7 @@ export const Mapping = () => {
     fetch(`${API_URL}/routes`)
       .then(res => res.json() as Promise<Route[]>)
   );
-  const [mapRef, setMapRef] = useState<Map | null>(null);
+  const mapRef = useRef<Map>();
   const [routeIdSelected, setRouteIdSelected] = useState<string | null>(null);
   const socketIORef = useRef<io.Socket>()
 
@@ -45,7 +45,7 @@ export const Mapping = () => {
       duration: 3000,
       isClosable: true,
     })
-    mapRef?.removeRoute(route._id)
+    mapRef.current?.removeRoute(route._id)
   }, [toast])
 
   const startRoute = useCallback(async (e: FormEvent) => {
@@ -57,7 +57,7 @@ export const Mapping = () => {
 
       const color = sample(shuffle(colorMap)) as string;
   
-      mapRef?.addRoute(routeSelected._id, {
+      mapRef.current?.addRoute(routeSelected._id, {
         currentMarkerOptions: {
           position: routeSelected.startPosition,
           icon: makeCarIcon(color)
@@ -101,7 +101,7 @@ export const Mapping = () => {
       position: [number, number];
       finished: boolean;
     }) => {
-      mapRef?.moveCurrentMarker(data.routeId, {
+      mapRef.current?.moveCurrentMarker(data.routeId, {
         lat: data.position[0],
         lng: data.position[1]
       })
@@ -127,10 +127,10 @@ export const Mapping = () => {
       ]);
 
       const divMap = document.getElementById('map') as HTMLElement
-      setMapRef(new Map(divMap, {
+      mapRef.current = new Map(divMap, {
         zoom: 15,
         center: position
-      }))
+      })
     })()
   }, [])
 
@@ -150,13 +150,13 @@ export const Mapping = () => {
                 ))}
               </Select>
               <Button type='submit' width='100%'>
-                Iniciar corrida
+                Start Run
               </Button>
             </Stack>
           )}
       </Box>
       <Box as='section' flex='1'>
-        {!mapRef&& <Skeleton height='100%' />}
+        {isLoading && <Skeleton height='100%' />}
         <Box id='map' height='100%'></Box>
       </Box>
     </Flex>
