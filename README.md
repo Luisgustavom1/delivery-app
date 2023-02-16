@@ -13,7 +13,7 @@ Stack:
     - NestJS
   #### Frontend
     - ReactJS
-  #### Observability and Data Analysis
+  #### Observability and Data Analysis [See details](/kafka)
     - Elasticsearch
     - Kibana 
   #### Deploy
