@@ -23,3 +23,7 @@ Stack:
     - Confluent Cloud
     - Kubernetes
     - Docker
+    
+    
+
+![Screenshot from 2023-02-16 23-28-36](https://user-images.githubusercontent.com/65229051/219534591-314487a8-988e-43f8-83f2-b2e03b1f6cbb.png)
