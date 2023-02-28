@@ -11,17 +11,17 @@ Delivery is an application developing during Imersão 12 of [Full Cycle](https:/
 
 Stack:
 
-  #### Observability and Data Analysis [See details](/kafka#use-case)
+  #### Observability and Data Analysis [See details](https://github.com/Luisgustavom1/delivery-app/tree/main/kafka#use-case)
     - Elasticsearch
     - Kibana 
   #### Microsservice
     - Golang
-  #### Messaging [See details](/kafka#use-case)
+  #### Messaging [See details](https://github.com/Luisgustavom1/delivery-app/tree/main/kafka#use-case)
     - Kafka
     - Kafka Connect
-  #### Backend [See details](/api#readme)
+  #### Backend [See details](https://github.com/Luisgustavom1/delivery-app/tree/main/api#readme)
     - NestJS
-  #### Frontend [See details](/front#readme)
+  #### Frontend [See details](https://github.com/Luisgustavom1/delivery-app/tree/main/front#readme)
     - ReactJS
   #### Deploy
     - Google Cloud
