@@ -19,9 +19,9 @@ Stack:
   #### Messaging [See details](/kafka#use-case)
     - Kafka
     - Kafka Connect
-  #### Backend [See details](/api)
+  #### Backend [See details](/api#readme)
     - NestJS
-  #### Frontend [See details](/front)
+  #### Frontend [See details](/front#readme)
     - ReactJS
   #### Deploy
     - Google Cloud
